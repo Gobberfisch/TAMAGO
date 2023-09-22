@@ -16,13 +16,11 @@ public class Tamago {
     //Set
     public void setLeben(int leben) {
         this.leben = leben;
-        return;
     }
 
     //Schaden berechnen bei normalem Angriff
     public void receiveBasicAttack (){
         this.leben = leben - 5;
-        return;
     }
 
     //Schaden berechnen bei SPEZIAL Angriff
