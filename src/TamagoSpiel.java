@@ -31,9 +31,10 @@ public class TamagoSpiel {
         //Klassenwahl
         //EXCEPTION HANDLER BEI INPUT
         Scanner scanner = new Scanner(System.in);
-        int inputKlasse = 0;
+        int inputKlasse;
 
         while (true) {
+
             try {
                 inputKlasse = scanner.nextInt();
 
@@ -105,14 +106,9 @@ public class TamagoSpiel {
         Spieler Spieler1 = new Spieler(inputKlasse);
 
 
-        //TODO
-        //Gibt die Klasse des Spielers zurück
-        //System.out.println(Spieler1.getKlasse());
-        //TODO _________________________
-
 
         //LEBEN AUSGABE
-        System.out.println("LEBEN     "+ Spieler1.getLeben() + "/100 ");
+        System.out.println("LEBEN     "+ Spieler1.getLeben() + "/" + Spieler1.getLebenMax());
         System.out.print("[");
         for (int i = 0 ; i < (Spieler1.getLeben()/10); i++){
             System.out.print("▓");
@@ -142,7 +138,7 @@ public class TamagoSpiel {
         System.out.println();
 
         //LEBEN AUSGABE
-        System.out.println("TAMAGO    "+ Tamago1.getLeben() + "/100 ");
+        System.out.println("TAMAGO    "+ Tamago1.getLeben() + "/"  + Tamago1.getLebenMax());
         System.out.print("[");
         for (int i = 0 ; i < (Tamago1.getLeben()/10); i++){
             System.out.print("▓");
@@ -152,15 +148,25 @@ public class TamagoSpiel {
         System.out.println();
 
         //Spiellogik
-        int tempPlayerInput = 0;
+        int tempPlayerInput;
+        boolean noPower = false;
+
         while (Spieler1.getLeben() > 0 && Tamago1.getLeben() > 0) {
+
+            if ((noPower == false) && (Spieler1.getleisteZweiWert() < (Spieler1.getLeisteZweiMax() -Spieler1.getLeisteZweiRegen() ) )){
+                Spieler1.setleisteZweiWert(Spieler1.getleisteZweiWert() + Spieler1.getLeisteZweiRegen() );
+            } else if ((Spieler1.getleisteZweiWert() > (Spieler1.getLeisteZweiMax() -Spieler1.getLeisteZweiRegen() )) && (Spieler1.getleisteZweiWert() < Spieler1.getLeisteZweiMax())){
+                Spieler1.setleisteZweiWert(Spieler1.getLeisteZweiMax());
+            }
+
+            noPower = false;
 
             //Kampfeingabe
             Thread.sleep(2000);
             System.out.println("Wähle deinen Angriff:");
-            System.out.println("1: normal");
-            System.out.println("2: SPECIAL");
-            System.out.println("3. U L T R A");
+            System.out.println("1: normal     -" + Spieler1.getBasicCost());
+            System.out.println("2: SPECIAL    -" + Spieler1.getSpecialCost());
+            System.out.println("3. U L T R A  -" + Spieler1.getUltraCost());
 
             //EceptionHandler
             scanner = new Scanner(System.in);
@@ -174,8 +180,6 @@ public class TamagoSpiel {
                     System.out.println("1: normal");
                     System.out.println("2: SPECIAL");
                     System.out.println("3. U L T R A");
-                } else {
-
                 }
 
             } catch (java.util.InputMismatchException e) {
@@ -215,11 +219,17 @@ public class TamagoSpiel {
 
 
 
-
                 Tamago1.receiveBasicAttack();
+
+                //Berserker Mechanik
+                if (Spieler1.getKlasse() == 1) {
+                    Spieler1.generateRage(10);
+                }
+
                 if (Tamago1.getLeben() > 0) {
+
                     //LEBEN AUSGABE
-                    System.out.println("TAMAGO    "+ Tamago1.getLeben() + "/100 ");
+                    System.out.println("TAMAGO    "+ Tamago1.getLeben() + "/"  + Tamago1.getLebenMax() );
                     System.out.print("[");
                     for (int i = 0 ; i < (Tamago1.getLeben()/10); i++){
                         System.out.print("▓");
@@ -229,7 +239,7 @@ public class TamagoSpiel {
                     System.out.println();
                 }
 
-            } else if (tempPlayerInput == 2) {
+            } else if ((tempPlayerInput == 2) && (Spieler1.getleisteZweiWert() > Spieler1.getSpecialCost())) {
                 //Spieler greift Tamago mit Spezial an
                 clearScreen(30);
                 System.out.println("""
@@ -257,8 +267,19 @@ public class TamagoSpiel {
 
                 Tamago1.receiveSpecialAttack();
                 if (Tamago1.getLeben() > 0) {
+                    //LeisteZwei berechnen
+
+                    //Berserker Mechanik
+                    if (Spieler1.getKlasse() == 1) {
+                        Spieler1.generateRage(20);
+                    }
+                    //Ritter Magier
+                    else {
+                        Spieler1.setleisteZweiWert(Spieler1.getleisteZweiWert() - Spieler1.getSpecialCost());
+                    }
+
                     //LEBEN AUSGABE
-                    System.out.println("TAMAGO    "+ Tamago1.getLeben() + "/100 ");
+                    System.out.println("TAMAGO    "+ Tamago1.getLeben() + "/"  + Tamago1.getLebenMax());
                     System.out.print("[");
                     for (int i = 0 ; i < (Tamago1.getLeben()/10); i++){
                         System.out.print("▓");
@@ -269,7 +290,7 @@ public class TamagoSpiel {
                 }
             }
 
-            else if (tempPlayerInput == 3){
+            else if ((tempPlayerInput == 3) && (Spieler1.getleisteZweiWert() > Spieler1.getUltraCost()) ){
                 //Spieler greift Tamago mit Spezial an
                 clearScreen(30);
                 System.out.println("""
@@ -299,8 +320,18 @@ public class TamagoSpiel {
 
                 Tamago1.receiveUltraAttack();
                 if (Tamago1.getLeben() > 0) {
+                    //LeisteZwei berechnen
+                    //Berserker Mechanik
+                    if (Spieler1.getKlasse() == 1) {
+                        Spieler1.generateRage(40);
+                    }
+                    //Ritter Magier
+                    else {
+                        Spieler1.setleisteZweiWert(Spieler1.getleisteZweiWert() - Spieler1.getUltraCost());
+                    }
+
                     //LEBEN AUSGABE
-                    System.out.println("TAMAGO    "+ Tamago1.getLeben() + "/100 ");
+                    System.out.println("TAMAGO    "+ Tamago1.getLeben() + "/"  + Tamago1.getLebenMax());
                     System.out.print("[");
                     for (int i = 0 ; i < (Tamago1.getLeben()/10); i++){
                         System.out.print("▓");
@@ -309,15 +340,59 @@ public class TamagoSpiel {
                     System.out.println();
                     System.out.println();
                 }
+            } else {
+                noPower = true;
+                System.out.println("Du hast nicht genug " + Spieler1.getLeisteZwei() );
+                    }
+
+
+            //Endbedingungen
+            if (Spieler1.getLeben() <= 0) {
+                clearScreen(20);
+                System.out.println("Du hast kein Leben mehr");
+                System.out.println("""
+                         ▄▀▀▄ ▀▀▄  ▄▀▀▀▀▄   ▄▀▀▄ ▄▀▀▄      ▄▀▀▀▀▄    ▄▀▀▀▀▄   ▄▀▀▀▀▄   ▄▀▀▀▀▄  ▄▀▀█▄▄▄▄\s
+                        █   ▀▄ ▄▀ █      █ █   █    █     █    █    █      █ █      █ █ █   ▐ ▐  ▄▀   ▐\s
+                        ▐     █   █      █ ▐  █    █      ▐    █    █      █ █      █    ▀▄     █▄▄▄▄▄ \s
+                              █   ▀▄    ▄▀   █    █           █     ▀▄    ▄▀ ▀▄    ▄▀ ▀▄   █    █    ▌ \s
+                            ▄▀      ▀▀▀▀      ▀▄▄▄▄▀        ▄▀▄▄▄▄▄▄▀ ▀▀▀▀     ▀▀▀▀    █▀▀▀    ▄▀▄▄▄▄  \s
+                            █                               █                          ▐       █    ▐  \s
+                            ▐                               ▐                                  ▐       \s
+                        """);
+                return ;
+            } else if (Tamago1.getLeben() <= 0) {
+
+
+                clearScreen(20);
+                System.out.println("       .-[][][]-.               ");
+                Thread.sleep(500);
+                System.out.println("      /   X  X   \\             ");
+                Thread.sleep(500);
+                System.out.println("      |   ____   |              ");
+                Thread.sleep(500);
+                System.out.println("      |          |            ");
+                Thread.sleep(500);
+                System.out.println("      \\__________/           ");
+                Thread.sleep(500);
+                System.out.println("       '--------'             ");
+                Thread.sleep(500);
+                System.out.println("        _/    \\_               ");
+                Thread.sleep(500);
+                clearScreen(3);
+
+
+                System.out.println("Tamago hat kein Leben mehr");
+                return ;
             }
 
-            Thread.sleep(3000);
+
+            Thread.sleep(2000);
 
             //Tamago wählt Attacke
             int tamagoattack = Spieler1.genRandomAttack() + 1;
 
             //Schadensberechnung Tamago
-            if (tamagoattack == 1) {
+            if ((tamagoattack == 1) && (noPower == false)) {
                 //Tamago greift Spieler normal an
                 //clearScreen(5);
                 System.out.println("""
@@ -341,7 +416,10 @@ public class TamagoSpiel {
                 Thread.sleep(1000);
 
 
-
+                //Berserker Mechanik
+                if (Spieler1.getKlasse() == 1) {
+                    Spieler1.generateRage(10);
+                }
                 Spieler1.receiveBasicAttack();
                 if (Tamago1.getLeben() > 0) {
                     //LEBEN AUSGABE
@@ -364,7 +442,7 @@ public class TamagoSpiel {
                     System.out.println();
                 }
 
-            } else if (tamagoattack == 2) {
+            } else if ((tamagoattack == 2) && (noPower == false)) {
                 //Tamago greift Spieler mit Spezial an
                 //clearScreen(5);
                 System.out.println("""
@@ -388,11 +466,14 @@ public class TamagoSpiel {
                 Thread.sleep(1000);
 
 
-
+                //Berserker Mechanik
+                if (Spieler1.getKlasse() == 1) {
+                    Spieler1.generateRage(20);
+                }
                 Spieler1.receiveSpecialAttack();
                 if (Tamago1.getLeben() > 0) {
                     //LEBEN AUSGABE
-                    System.out.println("LEBEN     "+ Spieler1.getLeben() + "/100 ");
+                    System.out.println("LEBEN     "+ Spieler1.getLeben() + "/" + Spieler1.getLebenMax());
                     System.out.print("[");
                     for (int i = 0 ; i < (Spieler1.getLeben()/10); i++){
                         System.out.print("▓");
@@ -412,7 +493,7 @@ public class TamagoSpiel {
                 }
             }
 
-            else if (tamagoattack == 3){
+            else if ((tamagoattack == 3) && (noPower == false)){
                 //Tamago greift Spieler mit Spezial an
                 //clearScreen(5);
                 System.out.println("""
@@ -438,8 +519,11 @@ public class TamagoSpiel {
                 System.out.println();
                 Thread.sleep(1000);
 
-
-                Tamago1.receiveUltraAttack();
+                //Berserker Mechanik
+                if (Spieler1.getKlasse() == 1) {
+                    Spieler1.generateRage(35);
+                }
+                Spieler1.receiveUltraAttack();
                 if (Spieler1.getLeben() > 0) {
                     //LEBEN AUSGABE
                     System.out.println("LEBEN     "+ Spieler1.getLeben() + "/100 ");
@@ -467,7 +551,7 @@ public class TamagoSpiel {
 
 
             //Endbedingungen
-            if (Spieler1.getLeben() <= 0) {
+                if (Spieler1.getLeben() <= 0) {
                 clearScreen(20);
                 System.out.println("Du hast kein Leben mehr");
                 System.out.println("""
@@ -518,7 +602,6 @@ public class TamagoSpiel {
         for (int i = 0 ; i < j ; i++){
             System.out.println();
         }
-        return;
     }
 
 
